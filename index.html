@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Login Demo</title>
+    <!-- Load Tailwind CSS for simple styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #2c2f33; /* Dark Discord-like background */
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <div id="app-container" class="bg-gray-800 p-8 md:p-12 rounded-xl shadow-2xl text-center w-full max-w-md transition-all duration-300">
+        <!-- Content will be injected here by JavaScript -->
+        
+        <!-- Loading spinner content, kept hidden until needed -->
+        <div id="loading-spinner" class="text-white hidden">
+            <svg class="animate-spin h-8 w-8 text-indigo-400 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="mt-4 text-gray-400">Processing login...</p>
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIGURATION ---
+        const CLIENT_ID = '1444715289072635934';
+        // This is now set to your specific Replit URL. You MUST also update this value in the Discord Developer Portal.
+        const REDIRECT_URI = 'https://48ea84d2-5617-4440-81ca-5a124c9c76c8-00-co2ay5ezuje9.janeway.replit.dev:3000/';
+        const SCOPES = 'identify'; 
+        const DISCORD_AUTH_URL = `https://discord.com/oauth2/authorize?response_type=code&client_id=${CLIENT_ID}&scope=${SCOPES}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
+        const USER_STORAGE_KEY = 'discordUser'; // Key for localStorage
+
+        // Get the loading spinner HTML content once for efficient injection
+        const loadingSpinnerHTML = document.getElementById('loading-spinner').outerHTML;
+        document.getElementById('loading-spinner').remove(); // Remove the template from the body
+
+        // ----------------------
+
+        const appContainer = document.getElementById('app-container');
+
+        // Helper function to clear session state and return to login screen
+        function logout() {
+            localStorage.removeItem(USER_STORAGE_KEY);
+            // Clean URL if present and redirect to clear state
+            history.replaceState(null, '', window.location.pathname);
+            renderLoginState();
+        }
+        
+        // Expose logout function globally for the button to use
+        window.logout = logout;
+
+
+        function renderLoginState() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const authCode = urlParams.get('code');
+            let loggedInUser = localStorage.getItem(USER_STORAGE_KEY);
+
+            if (authCode) {
+                // Scenario 1: User just authorized via Discord (we have the 'code')
+                
+                // Show loading state while simulating backend work
+                appContainer.innerHTML = loadingSpinnerHTML;
+                
+                // Simulate the async backend token exchange (takes 1.5 seconds)
+                setTimeout(() => {
+                    // --- SIMULATED AUTHENTICATION SUCCESS ---
+                    const mockUsername = 'TheDevUser#1444'; // This would be fetched from Discord's /users/@me
+                    
+                    // 1. Save the state for session persistence
+                    localStorage.setItem(USER_STORAGE_KEY, mockUsername);
+                    
+                    // 2. Clean the URL (remove the 'code' parameter)
+                    history.replaceState(null, '', window.location.pathname);
+                    
+                    // 3. Re-render the UI to the logged-in state
+                    renderLoggedInView(mockUsername);
+                }, 1500);
+                
+                return; // Stop rendering the rest of the function
+
+            } else if (loggedInUser) {
+                // Scenario 2: User is already logged in (state found in localStorage)
+                renderLoggedInView(loggedInUser);
+                
+            } else {
+                // Scenario 3: Initial State / Logged Out
+                
+                // --- Display Login Button ---
+                appContainer.innerHTML = `
+                    <h1 class="text-4xl font-extrabold text-white mb-4">Connect with Discord</h1>
+                    <p class="text-gray-400 mb-8">
+                        Please log in with your Discord account to continue.
+                    </p>
+                    <a href="${DISCORD_AUTH_URL}" id="login-button" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-lg text-white bg-indigo-600 hover:bg-indigo-700 transition duration-150 ease-in-out transform hover:scale-105 active:scale-95">
+                        <svg class="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!-- Discord Icon --><path d="M353.1 33.3C385.8 45 401.7 65 405.3 81.3c2.2 10.3-.2 20.3-10 32.8-17.7 22.5-35 44.5-51.5 66.8-17.6 23.7-36.2 47.9-55.5 71.7-18.4 22.8-37.4 45.4-56.7 68.1-18.5 22.8-37.6 45.4-56.9 68-18.3 22.8-37 45.4-56 68.2-18.6 22.8-37.4 45.4-56.5 68.2-17 20.9-32.9 41.5-48.4 62.4-1.2 1.5-1.9 3.3-2.1 5-.4 3.7.8 7.3 3.6 10.2 2.8 2.9 6.5 4.5 10.6 4.5h336c4.1 0 7.8-1.7 10.6-4.5 2.8-2.9 4-6.5 3.6-10.2-.2-1.7-.9-3.5-2.1-5-15.5-20.9-31.4-41.5-48.4-62.4-19.1-22.8-37.9-45.4-56.5-68.2-19-22.8-37.7-45.4-56-68.2-19.3-22.7-38.3-45.3-56.7-68.1-19.3-23.8-37.9-48-55.5-71.7-16.5-22.3-33.8-44.3-51.5-66.8-9.8-12.5-12.2-22.5-10-32.8 3.6-16.3 19.5-36.3 52.2-48 33.5-12.1 66.9-19.6 98.6-22.7 32.1-3.2 64.2-3.2 96.3 0 31.7 3.1 65.1 10.6 98.6 22.7z"/></svg>
+                        Login with Discord
+                    </a>
+                `;
+            }
+        }
+
+        // Renders the "Main Menu" view
+        function renderLoggedInView(username) {
+             appContainer.innerHTML = `
+                <h1 class="text-4xl font-extrabold text-green-400 mb-2">Main Menu</h1>
+                <p class="text-gray-300 text-lg mb-8">
+                    Welcome back, <span class="text-white font-semibold">${username.split('#')[0]}</span>.
+                </p>
+                
+                <!-- User Info Card -->
+                <div class="p-6 bg-gray-700 rounded-lg shadow-xl mb-8">
+                    <p class="text-sm font-semibold text-gray-400 uppercase mb-2">Authenticated Discord User:</p>
+                    <div class="flex items-center justify-center space-x-3">
+                        <svg class="w-8 h-8 text-indigo-400" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                        <p class="text-3xl font-extrabold text-white tracking-wider">${username}</p>
+                    </div>
+                </div>
+
+                <!-- Main Menu Options (Placeholder) -->
+                <div class="space-y-3 mb-8">
+                    <button class="w-full bg-gray-700 text-white py-3 rounded-md hover:bg-gray-600 transition duration-150 shadow-md">
+                        View Profile Settings
+                    </button>
+                    <button class="w-full bg-gray-700 text-white py-3 rounded-md hover:bg-gray-600 transition duration-150 shadow-md">
+                        Start Application Feature
+                    </button>
+                </div>
+                
+                <!-- Logout Button -->
+                <button onclick="logout()" class="w-full mt-4 bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition duration-150 transform hover:scale-[1.01] shadow-lg">
+                    Logout
+                </button>
+
+                <!-- Security Warning -->
+                <div class="mt-8 text-left p-4 bg-yellow-900/50 border-l-4 border-yellow-500 rounded-lg">
+                    <p class="text-sm text-yellow-200 font-semibold mb-2">
+                        SECURITY NOTE:
+                    </p>
+                    <p class="text-xs text-yellow-300">
+                        This view is powered by a simulated session saved in your browser's local storage. In a real environment, 
+                        the "code" would be sent to your secure backend server for token exchange.
+                    </p>
+                </div>
+            `;
+        }
+
+        // Run the logic when the page loads
+        document.addEventListener('DOMContentLoaded', renderLoginState);
+
+    </script>
+</body>
+</html>
