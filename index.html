@@ -31,13 +31,11 @@
     <script>
         // --- CONFIGURATION ---
         const CLIENT_ID = '1444715289072635934';
-        // This is now set to your specific Replit URL. You MUST also update this value in the Discord Developer Portal.
-const CLIENT_ID = '1444715289072635934';
-const REDIRECT_URI = 'https://south-central.onrender.com/auth/discord/callback';
-const SCOPES = 'identify';
-const STATE_PARAM = 'some_unique_and_secure_random_string'; 
-const DISCORD_AUTH_URL = `https://discord.com/oauth2/authorize?response_type=code&client_id=${CLIENT_ID}&scope=${encodeURIComponent(SCOPES)}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&state=${STATE_PARAM}`;
-const USER_STORAGE_KEY = 'discordUser';
+        // UPDATED: This must match your Render hosted URL EXACTLY.
+        const REDIRECT_URI = 'https://south-central.onrender.com/';
+        const SCOPES = 'identify'; 
+        const DISCORD_AUTH_URL = `https://discord.com/oauth2/authorize?response_type=code&client_id=${CLIENT_ID}&scope=${SCOPES}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
+        const USER_STORAGE_KEY = 'discordUser'; //
 
         // Get the loading spinner HTML content once for efficient injection
         const loadingSpinnerHTML = document.getElementById('loading-spinner').outerHTML;
