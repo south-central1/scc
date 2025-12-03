@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 const CLIENT_ID = '1444715289072635934';
 const REDIRECT_URI = window.location.origin + '/';
 const SCOPES = 'identify guilds.join guilds.members.read';
-const DISCORD_AUTH_URL = `https://discord.com/oauth2/authorize?response_type=code&client_id=${CLIENT_ID}&scope=${encodeURIComponent(SCOPES)}&redirect_uri=${encodeURIComponent('https://south-central.onrender.com/auth/discord/callback')}`;
+const DISCORD_AUTH_URL = `https://discord.com/oauth2/authorize?response_type=code&client_id=${CLIENT_ID}&scope=${encodeURIComponent(SCOPES)}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
 
 // Placeholder for UserIDs configuration - will be moved to a separate file
 const STAFF_USER_IDS = new Set([
