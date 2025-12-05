@@ -10,8 +10,8 @@ export function UpdateProgress() {
   const [animationComplete, setAnimationComplete] = useState(false);
 
   useEffect(() => {
-    setUpdateStatus(89);
-    setTargetPercentage(89);
+    setUpdateStatus(95);
+    setTargetPercentage(95);
   }, []);
 
   useEffect(() => {
@@ -58,10 +58,10 @@ export function UpdateProgress() {
             <span className="text-gaming-red" style={{ textShadow: "0 0 30px rgba(200, 30, 30, 0.5)" }}>
               Next
             </span>{" "}
-            <span className="text-foreground">Update</span>
+            <span className="text-foreground">Game Drop</span>
           </h1>
           <p className="text-muted-foreground text-lg">
-            Track the development progress of our upcoming update
+            Track the development progress of the GAME DROP!
           </p>
         </div>
 
@@ -73,7 +73,7 @@ export function UpdateProgress() {
           <div className="text-center mb-6">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-secondary rounded-full mb-4">
               <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              <span className="text-sm font-medium text-foreground">Status: Launching Soon</span>
+              <span className="text-sm font-medium text-foreground">Status: Dropping Soon</span>
             </div>
             <div
               className="text-6xl sm:text-7xl font-bold text-primary mb-4"
@@ -121,7 +121,7 @@ export function UpdateProgress() {
               Release in: <span className="font-bold text-primary">{countdown}</span>
             </p>
             <p className="text-sm text-muted-foreground mt-2">
-              Friday at 8PM - Development at {percentage}%
+              Friday at 8PM - Game Drop at {percentage}%
             </p>
           </div>
         </Card>
